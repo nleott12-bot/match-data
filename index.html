@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Match Pro — Pencocokan Data</title>
+<style>
+:root{--bg:#0b1120;--panel:#111a2e;--panel2:#172238;--line:#273650;--text:#e8eef9;--muted:#9aabc5;--blue:#38bdf8;--green:#34d399;--red:#fb7185;--amber:#fbbf24;--purple:#c4b5fd}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,#17264a 0,transparent 34%),var(--bg);color:var(--text);font:14px/1.5 Inter,Segoe UI,Arial,sans-serif}
+.wrap{max-width:1440px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:22px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:13px}.logo{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#0284c7,#7c3aed);font-size:24px;box-shadow:0 10px 28px #0284c744}
+h1{font-size:23px;margin:0;letter-spacing:.3px}.subtitle{color:var(--muted);margin-top:3px}.local{border:1px solid var(--line);background:#10192a;padding:8px 12px;border-radius:999px;color:#a7f3d0;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:18px}.stat{border:1px solid var(--line);border-radius:16px;padding:16px;background:linear-gradient(145deg,#141f34,#0f1728);min-height:105px}.stat .label{color:var(--muted);font-size:12px}.stat .value{font-size:27px;font-weight:750;margin-top:5px;letter-spacing:-.6px}.stat .hint{font-size:11px;color:var(--muted);margin-top:2px}.c-green{color:var(--green)}.c-red{color:var(--red)}.c-amber{color:var(--amber)}.c-blue{color:var(--blue)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:linear-gradient(160deg,#121d31,#0f1728);border:1px solid var(--line);border-radius:17px;padding:18px;min-width:0}.cardhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.card h2{font-size:16px;margin:0}.tag{font-size:11px;border-radius:7px;padding:4px 8px;background:#172c45;color:#7dd3fc}
+textarea{width:100%;min-height:210px;resize:vertical;background:#080f1d;border:1px solid #2a3b57;border-radius:12px;padding:13px;color:#e5edf9;font:12px/1.6 Consolas,Monaco,monospace;outline:none}textarea:focus,input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #38bdf81b}
+.help{color:var(--muted);font-size:12px;margin:8px 0 0}.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.field select,.field input,.search{width:100%;background:#080f1d;border:1px solid #2a3b57;border-radius:9px;padding:9px 10px;color:var(--text);outline:none}
+.checkline{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin-top:10px}.checkline input{accent-color:#38bdf8}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin:17px 0 20px}.btn{border:1px solid transparent;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;color:white;transition:.15s}.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}.primary{background:linear-gradient(100deg,#0284c7,#4f46e5);box-shadow:0 8px 20px #2563eb30}.secondary{background:#17243a;border-color:#31435f}.danger{background:#321b2b;border-color:#713348;color:#fecdd3}.success{background:#103328;border-color:#1e6049;color:#a7f3d0}
+.resulthead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.resulthead h2{margin:0;font-size:18px}.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.filters select{background:#080f1d;color:var(--text);border:1px solid #2a3b57;border-radius:9px;padding:9px;max-width:210px}.search{width:220px}
+.tablebox{overflow:auto;border:1px solid var(--line);border-radius:12px}table{width:100%;border-collapse:collapse;min-width:800px;background:#0b1322}th,td{text-align:left;padding:11px 12px;border-bottom:1px solid #202d43;vertical-align:top}th{background:#172238;color:#b9c8df;font-size:11px;text-transform:uppercase;letter-spacing:.5px;position:sticky;top:0}td{font-size:12px}tbody tr:hover{background:#111d30}tbody tr:last-child td{border-bottom:0}.pill{display:inline-block;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:700;white-space:nowrap}.p-match{background:#10392e;color:#6ee7b7}.p-missing{background:#3b1723;color:#fda4af}.p-mismatch{background:#3a2a12;color:#fcd34d}.p-duplicate{background:#2d2050;color:#ddd6fe}.p-neutral{background:#263247;color:#cbd5e1}.empty{padding:32px;text-align:center;color:var(--muted)}.foot{color:#8393ad;font-size:11px;text-align:center;margin:22px 0 4px}.notice{padding:11px 13px;border:1px solid #344665;border-radius:10px;background:#111f35;color:#c6d7ef;font-size:12px;margin-bottom:14px}.notice strong{color:white}.error{color:#fda4af}.summaryline{color:var(--muted);font-size:12px;margin:9px 0}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.wrap{padding:14px}.stat:last-child{grid-column:span 2}}@media(max-width:520px){h1{font-size:19px}.stats{gap:8px}.stat{padding:12px;min-height:90px}.stat .value{font-size:23px}.opts{grid-template-columns:1fr}.search{width:100%}.filters{width:100%}.filters select{max-width:none;flex:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo">⇄</div><div><h1>DATA MATCH PRO</h1><div class="subtitle">Panel pencocokan transaksi · Panel vs Google Docs</div></div></div>
+    <div class="local">● MODE LOKAL · DATA TETAP DI BROWSER</div>
+  </header>
+
+  <div class="notice"><strong>Petunjuk:</strong> salin tabel dari panel dan catatan dari Docs, lalu tempelkan masing-masing ke kotak di bawah. Pencocokan memakai <strong>nama pelanggan + nominal</strong>. Periksa pemilihan kolom jika format datamu berbeda.</div>
+
+  <section class="stats">
+    <div class="stat"><div class="label">Baris Data Panel</div><div class="value c-blue" id="statPanel">0</div><div class="hint">Setelah header dikecualikan</div></div>
+    <div class="stat"><div class="label">Baris Data Docs</div><div class="value c-blue" id="statDocs">0</div><div class="hint">Setelah header dikecualikan</div></div>
+    <div class="stat"><div class="label">Cocok</div><div class="value c-green" id="statMatch">0</div><div class="hint">Nama dan nominal sesuai</div></div>
+    <div class="stat"><div class="label">Perlu Diperiksa</div><div class="value c-red" id="statIssues">0</div><div class="hint">Hilang atau nominal berbeda</div></div>
+    <div class="stat"><div class="label">Duplikat</div><div class="value c-amber" id="statDup">0</div><div class="hint">Nama + nominal berulang</div></div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div class="cardhead"><h2>01 · Data dari Panel</h2><span class="tag">SUMBER A</span></div>
+      <textarea id="panelData" spellcheck="false" placeholder="Tempel tabel yang kamu copy dari panel transaksi di sini...&#10;&#10;Contoh:&#10;Nama Pelanggan    Nominal&#10;Budi              100000&#10;Siti               250000"></textarea>
+      <div class="opts">
+        <div class="field"><label for="panelName">Kolom nama pelanggan</label><select id="panelName"><option value="auto">Deteksi otomatis</option></select></div>
+        <div class="field"><label for="panelAmount">Kolom nominal</label><select id="panelAmount"><option value="auto">Deteksi otomatis</option></select></div>
+      </div>
+      <label class="checkline"><input id="panelHeader" type="checkbox" checked> Baris pertama adalah judul kolom (header)</label>
+      <p class="help">Tip: salin langsung tabel website. Format tab/newline biasanya terbaca otomatis.</p>
+    </div>
+    <div class="card">
+      <div class="cardhead"><h2>02 · Catatan dari Google Docs</h2><span class="tag">SUMBER B</span></div>
+      <textarea id="docsData" spellcheck="false" placeholder="Tempel catatan transaksi dari Google Docs di sini...&#10;&#10;Contoh:&#10;Nama Pelanggan    Nominal&#10;Budi              100000&#10;Siti               200000"></textarea>
+      <div class="opts">
+        <div class="field"><label for="docsName">Kolom nama pelanggan</label><select id="docsName"><option value="auto">Deteksi otomatis</option></select></div>
+        <div class="field"><label for="docsAmount">Kolom nominal</label><select id="docsAmount"><option value="auto">Deteksi otomatis</option></select></div>
+      </div>
+      <label class="checkline"><input id="docsHeader" type="checkbox" checked> Baris pertama adalah judul kolom (header)</label>
+      <p class="help">Catatan satu transaksi per baris juga bisa diproses selama nama dan nominal dapat dikenali.</p>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="btn primary" id="compareBtn">⇄ MULAI CEK SELISIH</button>
+    <button class="btn secondary" id="sampleBtn">Isi Data Contoh</button>
+    <button class="btn success" id="exportBtn" disabled>⇩ Ekspor Laporan Excel (CSV)</button>
+    <button class="btn danger" id="resetBtn">↺ Reset Semua Data</button>
+  </div>
+  <div id="message" class="summaryline" aria-live="polite">Belum ada pengecekan. Tempelkan kedua data lalu klik “Mulai Cek Selisih”.</div>
+
+  <section class="card">
+    <div class="resulthead">
+      <h2>03 · Hasil Pencocokan</h2>
+      <div class="filters">
+        <select id="statusFilter" aria-label="Filter status">
+          <option value="all">Semua status</option>
+          <option value="cocok">Cocok</option>
+          <option value="hilang_panel">Ada di panel, hilang di Docs</option>
+          <option value="hilang_docs">Ada di Docs, hilang di panel</option>
+          <option value="selisih">Selisih nominal</option>
+          <option value="duplikat">Duplikat</option>
+        </select>
+        <input class="search" id="searchBox" type="search" placeholder="Cari nama pelanggan...">
+      </div>
+    </div>
+    <div id="resultSummary" class="summaryline">Belum ada hasil.</div>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>Status</th><th>Nama pelanggan</th><th>Nominal panel</th><th>Nominal Docs</th><th>Selisih</th><th>Catatan</th></tr></thead>
+        <tbody id="resultBody"><tr><td colspan="6"><div class="empty">Hasil pencocokan akan tampil di sini.</div></td></tr></tbody>
+      </table>
+    </div>
+  </section>
+  <div class="foot">DATA MATCH PRO · Semua pencocokan dilakukan di browser ini. Tidak ada data yang dikirim ke server.</div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  let resultRows = [];
+  let lastStats = null;
+
+  const nameWords = ["nama pelanggan","nama","customer","pelanggan","username","user name","customer name","nama user","pemilik","name"];
+  const amountWords = ["nominal","jumlah","amount","total","transaksi","deposit","withdraw","withdrawal","pembayaran","nilai","saldo","rupiah","rp","jumlah uang","payment","amount (rp)","total transaksi"];
+
+  function normText(s){return String(s ?? "").normalize("NFKC").toLocaleLowerCase("id-ID").replace(/\s+/g," ").trim();}
+  function cleanName(s){return normText(s).replace(/[ \t]+/g," ");}
+  function parseAmount(raw){
+    let s=String(raw ?? "").trim();
+    if(!s) return null;
+    let neg=false;
+    if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}
+    if(/^-/.test(s)) neg=!neg;
+    s=s.replace(/rp\.?/ig,"").replace(/\b(idr|rupiah)\b/ig,"").replace(/[\s\u00a0]/g,"").replace(/[()]/g,"").replace(/[^0-9,.\-]/g,"");
+    if(!s || !/\d/.test(s)) return null;
+    s=s.replace(/-/g,"");
+    const commas=(s.match(/,/g)||[]).length, dots=(s.match(/\./g)||[]).length;
+    if(commas && dots){
+      // Separator paling kanan dianggap desimal jika setelahnya 1-2 digit; lainnya pemisah ribuan.
+      if(s.lastIndexOf(",")>s.lastIndexOf(".")){
+        s=s.replace(/\./g,"").replace(",",".");
+      } else {
+        s=s.replace(/,/g,"");
+      }
+    } else if(commas){
+      const parts=s.split(",");
+      if(parts.length>2 || (parts[parts.length-1].length===3 && parts[0].length>0)) s=parts.join("");
+      else s=s.replace(",",".");
+    } else if(dots){
+      const parts=s.split(".");
+      if(parts.length>2 || (parts[parts.length-1].length===3 && parts[0].length>0)) s=parts.join("");
+    }
+    const n=Number(s);
+    return Number.isFinite(n) ? (neg ? -Math.abs(n) : n) : null;
+  }
+  function detectDelimiter(line){
+    const options=["\t","|","; ", ";",","];
+    let best="\t", score=-1;
+    for(const d of options){
+      const count=line.split(d).length-1;
+      if(count>score){score=count;best=d;}
+    }
+    return score>0?best:null;
+  }
+  function splitLine(line, delimiter){
+    if(delimiter==="\t" || delimiter==="|") return line.split(delimiter).map(x=>x.trim());
+    if(delimiter==="; " || delimiter===";" || delimiter===","){
+      const d=delimiter.trim();
+      const out=[]; let cur="", quoted=false;
+      for(let i=0;i<line.length;i++){
+        const ch=line[i];
+        if(ch==='"'){
+          if(quoted && line[i+1]==='"'){cur+='"';i++;}
+          else quoted=!quoted;
+        } else if(ch===d && !quoted){out.push(cur.trim());cur="";}
+        else cur+=ch;
+      }
+      out.push(cur.trim());return out;
+    }
+    return line.trim().split(/\s{2,}/).map(x=>x.trim());
+  }
+  function parseTable(text, headerChecked, nameChoice, amountChoice){
+    const raw=String(text||"").replace(/\r/g,"").split("\n").map(x=>x.trimEnd()).filter(x=>x.trim()!=="");
+    if(!raw.length) return {rows:[],columns:[],error:"Data masih kosong."};
+    const delimiter=detectDelimiter(raw[0]) || (raw.some(x=>/\s{2,}/.test(x))? "spaces":null);
+    const lines=raw.map(line => delimiter==="spaces" ? line.trim().split(/\s{2,}/).map(x=>x.trim()) : delimiter ? splitLine(line,delimiter) : [line.trim()]);
+    const width=Math.max(...lines.map(x=>x.length));
+    const first=lines[0].slice(); while(first.length<width) first.push("");
+    const hasHeader=headerChecked;
+    const headers=hasHeader ? first.map((x,i)=>x.trim()||("Kolom "+(i+1))) : Array.from({length:width},(_,i)=>"Kolom "+(i+1));
+    let start=hasHeader?1:0;
+    const nameIdx=chooseColumn(headers, first, nameChoice, nameWords, "name");
+    const amountIdx=chooseColumn(headers, first, amountChoice, amountWords, "amount");
+    const rows=[];
+    for(let i=start;i<lines.length;i++){
+      const cells=lines[i].slice();while(cells.length<width)cells.push("");
+      const name=String(cells[nameIdx]??"").trim();
+      const amount=parseAmount(cells[amountIdx]);
+      if(!name && amount===null) continue;
+      if(!name || amount===null) {
+        rows.push({name:name||"(nama kosong)",key:cleanName(name),amount,rawAmount:String(cells[amountIdx]??"").trim(),rowNum:i+1,invalid:true,cells});
+      } else rows.push({name,key:cleanName(name),amount,rawAmount:String(cells[amountIdx]??"").trim(),rowNum:i+1,invalid:false,cells});
+    }
+    return {rows,columns:headers,nameIdx,amountIdx,delimiter:delimiter||"baris",error:null};
+  }
+  function chooseColumn(headers, first, choice, words, kind){
+    if(choice!=="auto" && Number.isInteger(Number(choice))) return Math.max(0,Math.min(headers.length-1,Number(choice)));
+    const candidates=headers.map((h,i)=>({i,s:normText(h)}));
+    for(const word of words){
+      const exact=candidates.find(x=>x.s===word);
+      if(exact)return exact.i;
+    }
+    const partial=candidates.find(x=>words.some(w=>x.s.includes(w)));
+    if(partial)return partial.i;
+    if(kind==="name") return headers.length>1?0:0;
+    // Fallback nominal: kolom terakhir, agar tidak salah mengambil kolom nama.
+    return Math.max(0,headers.length-1);
+  }
+  function fillColumnMenus(prefix, parsed){
+    const n=$(prefix+"Name"), a=$(prefix+"Amount");
+    const oldN=n.value,oldA=a.value;
+    const options=parsed.columns.map((h,i)=>`<option value="${i}">${escapeHTML(h)} (kolom ${i+1})</option>`).join("");
+    n.innerHTML='<option value="auto">Deteksi otomatis</option>'+options;
+    a.innerHTML='<option value="auto">Deteksi otomatis</option>'+options;
+    if(oldN!=="auto" && Number(oldN)<parsed.columns.length)n.value=oldN;
+    if(oldA!=="auto" && Number(oldA)<parsed.columns.length)a.value=oldA;
+  }
+  function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+  function money(n){if(n===null || n===undefined || !Number.isFinite(n))return "—";return new Intl.NumberFormat("id-ID",{maximumFractionDigits:2}).format(n);}
+  function statusLabel(s){return ({cocok:"Cocok",hilang_panel:"Hilang di Docs",hilang_docs:"Hilang di Panel",selisih:"Selisih Nominal",duplikat:"Duplikat",invalid:"Data Tidak Lengkap"})[s]||s;}
+  function statusClass(s){return ({cocok:"p-match",hilang_panel:"p-missing",hilang_docs:"p-missing",selisih:"p-mismatch",duplikat:"p-duplicate",invalid:"p-neutral"})[s]||"p-neutral";}
+  function compare(){
+    const p=parseTable($("panelData").value,$("panelHeader").checked,$("panelName").value,$("panelAmount").value);
+    const d=parseTable($("docsData").value,$("docsHeader").checked,$("docsName").value,$("docsAmount").value);
+    if(!String($("panelData").value).trim()||!String($("docsData").value).trim()){
+      $("message").innerHTML='<span class="error">Tempelkan data panel dan data Docs terlebih dahulu.</span>';return;
+    }
+    if(!p.rows.length||!d.rows.length){$("message").innerHTML='<span class="error">Data tidak terbaca. Periksa format tabel, header, dan pilihan kolom nama/nominal.</span>';return;}
+    fillColumnMenus("panel",p);fillColumnMenus("docs",d);
+    // Jika kolom dipilih manual, parse ulang memakai pilihan yang telah dipertahankan.
+    const pp=parseTable($("panelData").value,$("panelHeader").checked,$("panelName").value,$("panelAmount").value);
+    const dd=parseTable($("docsData").value,$("docsHeader").checked,$("docsName").value,$("docsAmount").value);
+    const P=pp.rows, D=dd.rows;
+    const pCounts=countPairs(P), dCounts=countPairs(D);
+    const byNameP=groupByName(P), byNameD=groupByName(D);
+    const allNames=new Set([...byNameP.keys(),...byNameD.keys()]);
+    const out=[];
+    for(const key of allNames){
+      const ps=(byNameP.get(key)||[]).slice(), ds=(byNameD.get(key)||[]).slice();
+      const usedP=new Set(),usedD=new Set();
+      // Cocokkan nominal persis dahulu, satu-ke-satu.
+      for(let i=0;i<ps.length;i++){
+        const pRow=ps[i]; if(pRow.invalid)continue;
+        const j=ds.findIndex((x,idx)=>!usedD.has(idx)&&!x.invalid&&x.amount===pRow.amount);
+        if(j>=0){
+          usedP.add(i);usedD.add(j);
+          const dup=(pCounts.get(pairKey(pRow))||0)>1||(dCounts.get(pairKey(ds[j]))||0)>1;
+          out.push(makeResult(dup?"duplikat":"cocok",pRow,ds[j],dup?"Nama dan nominal muncul lebih dari sekali pada salah satu sumber.":"Nama dan nominal cocok."));
+        }
+      }
+      const pRemain=ps.map((x,i)=>({x,i})).filter(o=>!usedP.has(o.i));
+      const dRemain=ds.map((x,i)=>({x,i})).filter(o=>!usedD.has(o.i));
+      // Untuk nama yang sama tetapi nominal berbeda, pasangkan sisa baris satu-ke-satu.
+      const pValid=pRemain.filter(o=>!o.x.invalid), dValid=dRemain.filter(o=>!o.x.invalid);
+      const n=Math.min(pValid.length,dValid.length);
+      for(let k=0;k<n;k++){
+        const pr=pValid[k].x, dr=dValid[k].x;
+        usedP.add(pValid[k].i);usedD.add(dValid[k].i);
+        const dup=(pCounts.get(pairKey(pr))||0)>1||(dCounts.get(pairKey(dr))||0)>1;
+        out.push(makeResult(dup?"duplikat":"selisih",pr,dr,dup?"Ada pencatatan berulang; periksa kedua sumber.":"Nama sama, tetapi nominal berbeda."));
+      }
+      for(const o of pRemain){
+        if(usedP.has(o.i))continue;
+        const x=o.x;
+        out.push(makeResult(x.invalid?"invalid":"hilang_panel",x,null,x.invalid?"Nama atau nominal panel tidak terbaca.":"Ada di panel, tidak ditemukan di Docs."));
+      }
+      for(const o of dRemain){
+        if(usedD.has(o.i))continue;
+        const x=o.x;
+        out.push(makeResult(x.invalid?"invalid":"hilang_docs",null,x,x.invalid?"Nama atau nominal Docs tidak terbaca.":"Ada di Docs, tidak ditemukan di panel."));
+      }
+    }
+    // Stabilkan urutan status: masalah lebih dahulu, kemudian cocok.
+    const order={invalid:0,duplikat:1,selisih:2,hilang_panel:3,hilang_docs:4,cocok:5};
+    out.sort((a,b)=>(order[a.status]??9)-(order[b.status]??9)||String(a.name).localeCompare(String(b.name),"id"));
+    resultRows=out;lastStats={P,D};
+    render();
+    const issues=out.filter(x=>["hilang_panel","hilang_docs","selisih","invalid"].includes(x.status)).length;
+    $("message").textContent=`Pengecekan selesai: ${P.length} baris panel dan ${D.length} baris Docs diproses. Periksa hasil di bawah, terutama data yang tidak lengkap atau kolom yang salah terdeteksi.`;
+    $("exportBtn").disabled=false;
+  }
+  function pairKey(r){return r.key+"||"+(r.amount===null?"INVALID":String(r.amount));}
+  function countPairs(rows){const m=new Map();rows.forEach(r=>{const k=pairKey(r);m.set(k,(m.get(k)||0)+1)});return m;}
+  function groupByName(rows){const m=new Map();rows.forEach(r=>{const k=r.key||"__empty__";if(!m.has(k))m.set(k,[]);m.get(k).push(r)});return m;}
+  function makeResult(status,p,d,note){
+    const name=(p&&p.name!=="(nama kosong)"?p.name:null)||(d&&d.name!=="(nama kosong)"?d.name:null)||"(nama kosong)";
+    const pa=p?p.amount:null, da=d?d.amount:null;
+    return {status,name,panel:pa,docs:da,diff:pa!==null&&da!==null?pa-da:null,note,pRow:p?p.rowNum:null,dRow:d?d.rowNum:null};
+  }
+  function render(){
+    const s=lastStats||{P:[],D:[]};
+    const matched=resultRows.filter(x=>x.status==="cocok").length;
+    const dup=resultRows.filter(x=>x.status==="duplikat").length;
+    const issues=resultRows.filter(x=>["hilang_panel","hilang_docs","selisih","invalid"].includes(x.status)).length;
+    $("statPanel").textContent=s.P.length;$("statDocs").textContent=s.D.length;
+    $("statMatch").textContent=matched;$("statIssues").textContent=issues;$("statDup").textContent=dup;
+    const filter=$("statusFilter").value, q=normText($("searchBox").value);
+    const rows=resultRows.filter(r=>(filter==="all"||r.status===filter)&&(!q||normText(r.name).includes(q)));
+    $("resultSummary").textContent=`Menampilkan ${rows.length} dari ${resultRows.length} hasil · ${matched} cocok · ${issues} perlu diperiksa · ${dup} duplikat`;
+    $("resultBody").innerHTML=rows.length?rows.map(r=>`<tr>
+      <td><span class="pill ${statusClass(r.status)}">${statusLabel(r.status)}</span></td>
+      <td><strong>${escapeHTML(r.name)}</strong><div class="help">Panel: ${r.pRow??"—"} · Docs: ${r.dRow??"—"}</div></td>
+      <td>${money(r.panel)}</td><td>${money(r.docs)}</td>
+      <td>${r.diff===null?"—":(r.diff>0?"+":"")+money(r.diff)}</td><td>${escapeHTML(r.note)}</td>
+    </tr>`).join(""):'<tr><td colspan="6"><div class="empty">Tidak ada hasil untuk filter ini.</div></td></tr>';
+  }
+  function exportCSV(){
+    if(!resultRows.length){$("message").textContent="Belum ada hasil untuk diekspor.";return;}
+    const rows=[["Status","Nama pelanggan","Nominal panel","Nominal Docs","Selisih (Panel - Docs)","Catatan","Baris panel","Baris Docs"]];
+    resultRows.forEach(r=>rows.push([statusLabel(r.status),r.name,r.panel??"",r.docs??"",r.diff??"",r.note,r.pRow??"",r.dRow??""]));
+    const csv="\uFEFF"+rows.map(row=>row.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(";")).join("\r\n");
+    const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+    const url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url;a.download="laporan-selisih-data-match-pro.csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    $("message").textContent="Laporan berhasil dibuat dalam format CSV yang dapat dibuka di Microsoft Excel.";
+  }
+  function resetAll(){
+    if(!confirm("Hapus semua data yang ditempel dan hasil pengecekan?"))return;
+    ["panelData","docsData"].forEach(id=>$(id).value="");
+    ["panelName","panelAmount","docsName","docsAmount"].forEach(id=>$(id).innerHTML='<option value="auto">Deteksi otomatis</option>');
+    $("panelHeader").checked=true;$("docsHeader").checked=true;$("statusFilter").value="all";$("searchBox").value="";
+    resultRows=[];lastStats=null;
+    ["statPanel","statDocs","statMatch","statIssues","statDup"].forEach(id=>$(id).textContent="0");
+    $("resultBody").innerHTML='<tr><td colspan="6"><div class="empty">Hasil pencocokan akan tampil di sini.</div></td></tr>';
+    $("resultSummary").textContent="Belum ada hasil.";$("message").textContent="Semua data dan hasil pengecekan telah dikosongkan.";$("exportBtn").disabled=true;
+  }
+  function loadSample(){
+    $("panelData").value="Nama Pelanggan\tNominal\tID Transaksi\nBudi\t100000\tTRX001\nSiti\t250000\tTRX002\nAndi\t150000\tTRX003\nDewi\t75000\tTRX004\nBudi\t100000\tTRX005";
+    $("docsData").value="Nama Pelanggan\tNominal\tCatatan\nBudi\t100000\tinput 1\nSiti\t200000\tnominal berbeda\nAndi\t150000\tinput 3\nRina\t50000\ttidak ada di panel\nBudi\t100000\tinput ganda";
+    $("panelHeader").checked=true;$("docsHeader").checked=true;
+    $("panelName").innerHTML='<option value="auto">Deteksi otomatis</option>';$("panelAmount").innerHTML='<option value="auto">Deteksi otomatis</option>';
+    $("docsName").innerHTML='<option value="auto">Deteksi otomatis</option>';$("docsAmount").innerHTML='<option value="auto">Deteksi otomatis</option>';
+    compare();
+  }
+  $("compareBtn").addEventListener("click",compare);
+  $("exportBtn").addEventListener("click",exportCSV);
+  $("resetBtn").addEventListener("click",resetAll);
+  $("sampleBtn").addEventListener("click",loadSample);
+  $("statusFilter").addEventListener("change",render);
+  $("searchBox").addEventListener("input",render);
+  ["panelData","docsData"].forEach(id=>$(id).addEventListener("input",()=>{ $("exportBtn").disabled=true; }));
+})();
+</script>
+</body>
+</html>
